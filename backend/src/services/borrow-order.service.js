@@ -10,7 +10,11 @@ import {
 import { AppError } from '../utils/app-error.js';
 import { generateBorrowOrderCode } from '../utils/borrow-order.js';
 import { getPagination, getPaginationMeta } from '../utils/pagination.js';
-import { releaseReservedCopies } from './borrow-copy.service.js';
+import {
+  borrowReservedCopies,
+  releaseReservedCopies,
+  returnBorrowedCopies
+} from './borrow-copy.service.js';
 
 const orderStatuses = ['pending', 'approved', 'borrowed', 'returned', 'rejected', 'cancelled'];
 const activeOrderStatuses = ['pending', 'approved', 'borrowed'];
@@ -193,31 +197,6 @@ async function listOrders({ where, page, limit, search }) {
   };
 }
 
-async function borrowReservedCopies(orderId, transaction){
-  const items = await BorrowOrderItem.findAll({
-    where: {orderId},
-    transaction,
-    lock: transaction.LOCK.UPDATE
-  });
-  for (const item of items){
-    const copy = await BookCopy.findByPk(item.copyId, {
-      transaction,
-      lock: transaction.LOCK.UPDATE
-    });
-    if(!copy || copy.status !== 'reserved'){
-      throw new AppError(
-        'Reserved copy was not found',409
-        ,
-        'COPY_STATUS_CONFLICT'
-      );
-    }
-    await copy.update(
-      {status: 'borrowed'},
-      {transaction}
-    );
-  }
-}
-
 export async function listMyBorrowOrders({ userId, page, limit, search, status }) {
   return listOrders({
     where: { userId, ...(status ? { status } : {}) },
@@ -271,26 +250,25 @@ export async function updateBorrowOrderStatus(orderId, data, adminId) {
   try {
     const order = await findOrderOrThrow(orderId, {transaction});
 
-    if (order.status !== 'pending'){
+    const allowedStatuses = transitions[order.status] || [];
+
+    if (!allowedStatuses.includes(data.status)) {
       throw new AppError(
-        'Only pending orders can be updated',
+        `Cannot change order status from ${order.status} to ${data.status}`,
         400,
         'INVALID_BORROW_ORDER_STATUS'
       );
     }
 
-    if (!['approved', 'cancelled'].includes(data.status)){
-      throw new AppError(
-        'Invalid borrow order status',
-        400,
-        'Invalid_Order_Status'
-      );
-    }
-    if (data.status === 'approved') {
+    if (data.status === 'borrowed') {
       await borrowReservedCopies(orderId, transaction);
     }
 
-    if (data.status === 'cancelled') {
+    if (data.status === 'returned') {
+      await returnBorrowedCopies(orderId, transaction);
+    }
+
+    if (data.status === 'cancelled' || data.status === 'rejected') {
       await releaseReservedCopies(
         order.id,
         transaction

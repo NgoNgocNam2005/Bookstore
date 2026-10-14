@@ -53,6 +53,19 @@ function AppShell({ user, onLogout, onNavigate, currentPath, children }) {
             <span>▤</span>
             Categories
           </a>
+          {['admin', 'staff'].includes(user.role) && (
+            <a
+              className={`nav-item ${currentPath === '/book-copies' ? 'active' : ''}`}
+              href="/book-copies"
+              onClick={(event) => {
+                event.preventDefault();
+                onNavigate('/book-copies');
+              }}
+            >
+              <span>▣</span>
+              Book copies
+            </a>
+          )}
           {user.role === 'admin' ? (
             <a
               className={`nav-item ${currentPath === '/borrow-orders' ? 'active' : ''}`}

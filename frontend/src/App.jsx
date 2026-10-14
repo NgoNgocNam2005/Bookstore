@@ -3,6 +3,7 @@ import AppShell from './components/AppShell.jsx';
 import CategoriesPage from './pages/CategoriesPage.jsx';
 import { AuthProvider, useAuth } from './context/AuthContext.jsx';
 import BooksPage from './pages/BooksPage.jsx';
+import BookCopiesPage from './pages/BookCopiesPage.jsx';
 import BorrowingPage from './pages/BorrowingPage.jsx';
 import BorrowOrdersPage from './pages/BorrowOrdersPage.jsx';
 import LoginPage from './pages/LoginPage.jsx';
@@ -66,7 +67,9 @@ function AppContent() {
     >
       {path === '/books' ? <BooksPage />
         : path === '/categories' ? <CategoriesPage />
-          : path === '/borrow' ? <BorrowingPage />
+          : path === '/book-copies' && ['admin', 'staff'].includes(user.role)
+            ? <BookCopiesPage />
+            : path === '/borrow' ? <BorrowingPage />
             : path === '/borrow-orders' && user.role === 'admin' ? <BorrowOrdersPage /> : (
         <ProfilePage
           user={user}
