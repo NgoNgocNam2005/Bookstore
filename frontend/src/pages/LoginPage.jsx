@@ -1,6 +1,6 @@
 import { useState } from 'react';
 
-function LoginPage({ onLogin }) {
+function LoginPage({ onLogin, onNavigate }) {
   const [identifier, setIdentifier] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
@@ -72,6 +72,14 @@ function LoginPage({ onLogin }) {
                 required
               />
             </label>
+
+            <button
+              className="auth-text-button"
+              type="button"
+              onClick={() => onNavigate('/forgot-password')}
+            >
+              Forgot password?
+            </button>
 
             {error && <p className="form-error">{error}</p>}
 

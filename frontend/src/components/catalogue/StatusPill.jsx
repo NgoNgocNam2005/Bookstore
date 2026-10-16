@@ -5,7 +5,10 @@ function StatusPill({ status }) {
     borrowed: 'Borrowed',
     returned: 'Returned',
     rejected: 'Rejected',
-    cancelled: 'Cancelled'
+    cancelled: 'Cancelled',
+    active: 'Active',
+    inactive: 'Inactive',
+    invited: 'Invited'
   };
 
   return <span className={`status-pill status-${status}`}>{labels[status] || status}</span>;

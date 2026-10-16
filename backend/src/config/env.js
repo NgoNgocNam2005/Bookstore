@@ -19,7 +19,15 @@ const env = Object.freeze({
   },
   jwtSecret: process.env.JWT_SECRET || 'development-only-secret',
   jwtExpiresIn: process.env.JWT_EXPIRES_IN || '1d',
-  bcryptSaltRounds: Number(process.env.BCRYPT_SALT_ROUNDS) || 12
+  bcryptSaltRounds: Number(process.env.BCRYPT_SALT_ROUNDS) || 12,
+  smtp: {
+    host: process.env.SMTP_HOST || '',
+    port: Number(process.env.SMTP_PORT) || 587,
+    secure: process.env.SMTP_SECURE === 'true',
+    user: process.env.SMTP_USER || '',
+    password: process.env.SMTP_PASSWORD || '',
+    from: process.env.SMTP_FROM || ''
+  }
 });
 
 export default env;

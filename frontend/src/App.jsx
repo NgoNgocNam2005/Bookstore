@@ -6,8 +6,14 @@ import BooksPage from './pages/BooksPage.jsx';
 import BookCopiesPage from './pages/BookCopiesPage.jsx';
 import BorrowingPage from './pages/BorrowingPage.jsx';
 import BorrowOrdersPage from './pages/BorrowOrdersPage.jsx';
+import OverdueOrdersPage from './pages/OverdueOrdersPage.jsx';
 import LoginPage from './pages/LoginPage.jsx';
 import ProfilePage from './pages/ProfilePage.jsx';
+import DashboardPage from './pages/DashboardPage.jsx';
+import UsersPage from './pages/UsersPage.jsx';
+import ActivateAccountPage from './pages/ActivateAccountPage.jsx';
+import ForgotPasswordPage from './pages/ForgotPasswordPage.jsx';
+import ResetPasswordPage from './pages/ResetPasswordPage.jsx';
 
 function AppContent() {
   const {
@@ -36,7 +42,14 @@ function AppContent() {
   }
 
   useEffect(() => {
-    if (!isLoading && !user && path !== '/login') {
+    const publicPaths = [
+      '/login',
+      '/activate-account',
+      '/forgot-password',
+      '/reset-password'
+    ];
+
+    if (!isLoading && !user && !publicPaths.includes(path)) {
       navigate('/login');
     }
 
@@ -54,8 +67,20 @@ function AppContent() {
     );
   }
 
+  if (path === '/activate-account') {
+    return <ActivateAccountPage onNavigate={navigate} />;
+  }
+
+  if (path === '/forgot-password') {
+    return <ForgotPasswordPage onNavigate={navigate} />;
+  }
+
+  if (path === '/reset-password') {
+    return <ResetPasswordPage onNavigate={navigate} />;
+  }
+
   if (!user) {
-    return <LoginPage onLogin={login} />;
+    return <LoginPage onLogin={login} onNavigate={navigate} />;
   }
 
   return (
@@ -65,11 +90,14 @@ function AppContent() {
       onNavigate={navigate}
       onLogout={() => { logout(); navigate('/login'); }}
     >
-      {path === '/books' ? <BooksPage />
+      {path === '/dashboard' && user.role === 'admin' ? <DashboardPage />
+        : path === '/users' && ['admin', 'editor', 'staff'].includes(user.role) ? <UsersPage />
+        : path === '/books' ? <BooksPage />
         : path === '/categories' ? <CategoriesPage />
           : path === '/book-copies' && ['admin', 'staff'].includes(user.role)
             ? <BookCopiesPage />
             : path === '/borrow' ? <BorrowingPage />
+            : path === '/overdue-orders' && user.role === 'admin' ? <OverdueOrdersPage />
             : path === '/borrow-orders' && user.role === 'admin' ? <BorrowOrdersPage /> : (
         <ProfilePage
           user={user}

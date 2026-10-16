@@ -5,13 +5,18 @@ import { initBorrowOrderItemModel } from './borrow-order-item.model.js';
 import { initBorrowOrderModel } from './borrow-order.model.js';
 import {initBookCopyModel} from './book-copy.model.js';
 import { initUserModel } from './user.model.js';
+import { initUserInvitationModel } from './user-invitation.model.js';
+
 
 const User = initUserModel(sequelize);
 const BookCategory = initBookCategoryModel(sequelize);
 const Book = initBookModel(sequelize);
 const BorrowOrder = initBorrowOrderModel(sequelize);
 const BorrowOrderItem = initBorrowOrderItemModel(sequelize);
+const UserInvitation = initUserInvitationModel(sequelize);
 const BookCopy = initBookCopyModel(sequelize);
+
+
 User.hasMany(BookCategory, { foreignKey: 'createdBy', as: 'createdCategories' });
 BookCategory.belongsTo(User, { foreignKey: 'createdBy', as: 'creator' });
 BookCategory.hasMany(Book, { foreignKey: 'categoryId', as: 'books' });
@@ -38,5 +43,6 @@ export {
   BorrowOrder,
   BorrowOrderItem,
   User,
+  UserInvitation,
   sequelize
 };

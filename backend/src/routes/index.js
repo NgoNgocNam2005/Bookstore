@@ -6,6 +6,7 @@ import borrowOrderRoutes from './borrow-order.routes.js';
 import categoryRoutes from './category.routes.js';
 import healthRoutes from './health.routes.js';
 import userRoutes from './user.routes.js';
+import dashboardRoutes from './dashboard.routes.js';
 
 const apiRouter = Router();
 
@@ -16,5 +17,6 @@ apiRouter.use('/book-categories', categoryRoutes);
 apiRouter.use('/books', bookRoutes);
 apiRouter.use('/book-copies', bookCopyRoutes);
 apiRouter.use('/borrow-orders', borrowOrderRoutes);
+apiRouter.use('/dashboard', dashboardRoutes);
 
 export default apiRouter;

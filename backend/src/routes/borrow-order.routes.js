@@ -6,6 +6,7 @@ import {
   getMyBorrowOrderController,
   listBorrowOrdersController,
   listMyBorrowOrdersController,
+  listOverdueBorrowOrdersController,
   updateBorrowOrderStatusController
 } from '../controllers/borrow-order.controller.js';
 import { authMiddleware } from '../middlewares/auth.middleware.js';
@@ -53,6 +54,13 @@ router.get(
   requireRoles('admin', 'staff'),
   validate(listBorrowOrdersSchema),
   asyncHandler(listBorrowOrdersController)
+);
+
+router.get(
+  '/overdue',
+  requireRoles('admin', 'staff'),
+  validate(listBorrowOrdersSchema),
+  asyncHandler(listOverdueBorrowOrdersController)
 );
   
 router.get(

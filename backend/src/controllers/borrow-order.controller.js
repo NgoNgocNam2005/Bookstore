@@ -5,6 +5,7 @@ import {
   getMyBorrowOrder,
   listBorrowOrders,
   listMyBorrowOrders,
+  listOverdueBorrowOrders,
   updateBorrowOrderStatus
 } from '../services/borrow-order.service.js';
 import { sendSuccess } from '../utils/response.js';
@@ -65,4 +66,15 @@ export async function updateBorrowOrderStatusController(request, response) {
   );
 
   return sendSuccess(response, { order });
+}
+
+export async function listOverdueBorrowOrdersController(request, response) {
+  const result = await listOverdueBorrowOrders(request.validated.query);
+
+  return sendSuccess(
+    response,
+    {items: result.items},
+    200,
+    result.meta
+  );
 }

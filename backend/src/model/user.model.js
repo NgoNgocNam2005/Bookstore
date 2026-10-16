@@ -26,7 +26,7 @@ export function initUserModel(sequelize) {
         defaultValue: 'user'
       },
       status: {
-        type: DataTypes.ENUM('active', 'inactive'),
+        type: DataTypes.ENUM('active', 'inactive', 'invited'),
         allowNull: false,
         defaultValue: 'active'
       },

@@ -20,6 +20,32 @@ function AppShell({ user, onLogout, onNavigate, currentPath, children }) {
 
         <nav className="sidebar-nav" aria-label="Main navigation">
           <span className="nav-label">Workspace</span>
+          {user.role === 'admin' && (
+            <a
+              className={`nav-item ${currentPath === '/dashboard' ? 'active' : ''}`}
+              href="/dashboard"
+              onClick={(event) => {
+                event.preventDefault();
+                onNavigate('/dashboard');
+              }}
+            >
+              <span>▦</span>
+              Dashboard
+            </a>
+          )}
+          {['admin', 'editor', 'staff'].includes(user.role) && (
+            <a
+              className={`nav-item ${currentPath === '/users' ? 'active' : ''}`}
+              href="/users"
+              onClick={(event) => {
+                event.preventDefault();
+                onNavigate('/users');
+              }}
+            >
+              <span>♙</span>
+              User accounts
+            </a>
+          )}
           <a
             className={`nav-item ${currentPath === '/profile' ? 'active' : ''}`}
             href="/profile"
@@ -89,6 +115,19 @@ function AppShell({ user, onLogout, onNavigate, currentPath, children }) {
             >
               <span>↗</span>
               Borrow books
+            </a>
+          )}
+          {user.role === 'admin' && (
+            <a
+              className={`nav-item ${currentPath === '/overdue-orders' ? 'active' : ''}`}
+              href="/overdue-orders"
+              onClick={(event) => {
+                event.preventDefault();
+                onNavigate('/overdue-orders');
+              }}
+            >
+              <span>!</span>
+              Overdue returns
             </a>
           )}
         </nav>

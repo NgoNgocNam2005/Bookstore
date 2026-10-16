@@ -132,7 +132,9 @@ function BorrowOrdersPage() {
         body: {
           status: nextStatus,
           adminNote: adminNote || null,
-          dueAt: dueAt ? new Date(dueAt).toISOString() : null
+          ...(nextStatus === 'borrowed' && dueAt
+            ? { dueAt: new Date(dueAt).toISOString() }
+            : {})
         }
       });
       closeStatusModal();
@@ -255,10 +257,17 @@ function BorrowOrdersPage() {
                 ))}
               </select>
             </div>
-            <div className="form-field">
-              <label>Due date</label>
-              <input type="datetime-local" value={dueAt} onChange={(event) => setDueAt(event.target.value)} />
-            </div>
+            {nextStatus === 'borrowed' && (
+              <div className="form-field">
+                <label>Due date <span className="required">*</span></label>
+                <input
+                  type="datetime-local"
+                  value={dueAt}
+                  onChange={(event) => setDueAt(event.target.value)}
+                  required
+                />
+              </div>
+            )}
             <div className="form-field">
               <label>Admin note</label>
               <textarea

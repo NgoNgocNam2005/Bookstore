@@ -215,6 +215,18 @@ export async function listBorrowOrders({ page, limit, search, status }) {
   });
 }
 
+export async function listOverdueBorrowOrders({ page, limit, search }) {
+  return listOrders({
+    where: {
+      status: 'borrowed',
+      dueAt: { [Op.lt]: new Date() }
+    },
+    page,
+    limit,
+    search
+  });
+}
+
 export async function getMyBorrowOrder(orderId, userId) {
   const order = await findOrderOrThrow(orderId);
 
@@ -260,8 +272,29 @@ export async function updateBorrowOrderStatus(orderId, data, adminId) {
       );
     }
 
+    let dueAtToSave = order.dueAt;
+
     if (data.status === 'borrowed') {
-      await borrowReservedCopies(orderId, transaction);
+      
+      dueAtToSave = data.dueAt ? new Date(data.dueAt) : order.dueAt;
+
+      if (!dueAtToSave || Number.isNaN(dueAtToSave.getTime())) {
+        throw new AppError(
+          'Due date is required when handing books to the customer',
+          400,
+          'DUE_DATE_REQUIRED'
+        );
+      }
+
+      if (dueAtToSave <= new Date()) {
+        throw new AppError(
+          'Due date must be in the future',
+          400,
+          'INVALID_DUE_DATE'
+        );
+      }
+
+      await borrowReservedCopies(order.id, transaction);
     }
 
     if (data.status === 'returned') {
@@ -278,6 +311,7 @@ export async function updateBorrowOrderStatus(orderId, data, adminId) {
       {
         status: data.status,
         adminNote: data.adminNote ?? null, 
+        dueAt: dueAtToSave,
         processedBy: adminId,
         processedAt: new Date()
       },

@@ -18,9 +18,27 @@ import {
   updateProfileSchema,
   userIdSchema
 } from '../validators/user.validator.js';
+import rateLimit from 'express-rate-limit';
+import {
+  createUserInvitationController,
+  resendUserInvitationController
+} from '../controllers/user-invitation.controller.js';
+import {
+  createUserInvitationSchema,
+  resendInvitationSchema
+} from '../validators/user-invitation.validator.js';
+
 
 const router = Router();
-const canManageUsers = requireRoles('admin', 'staff');
+const canCreateUsers = requireRoles('admin', 'editor', 'staff');
+const canManageUsers = requireRoles('admin');
+const invitationLimiter = rateLimit({
+  windowMs: 60 * 60 * 1000,
+  limit: 20,
+  standardHeaders: true,
+  legacyHeaders: false
+});
+
 
 router.get('/me', authMiddleware, asyncHandler(getMyProfile));
 
@@ -45,6 +63,24 @@ router.get(
   canManageUsers,
   validate(listUsersSchema),
   asyncHandler(listUsersController)
+);
+
+router.post(
+  '/', 
+  authMiddleware,
+  canCreateUsers,
+  invitationLimiter,
+  validate(createUserInvitationSchema),
+  asyncHandler(createUserInvitationController)
+);
+
+router.post(
+  '/:id/resend-invitation',
+  authMiddleware,
+  canCreateUsers,
+  invitationLimiter,
+  validate(resendInvitationSchema),
+  asyncHandler(resendUserInvitationController)
 );
 
 router.get(
